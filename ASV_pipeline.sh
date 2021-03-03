@@ -120,7 +120,7 @@ fi
 
 echo "Dereplicating"
 usearch -fastx_uniques ${5}/${sample}.3trimmed.fastq -fastaout \
-  ${5}/${sample}.trimmed.derep.fasta -sizeout
+  ${5}/${sample}.trimmed.derep.fasta -sizeout -threads ${8}
 
 echo "Estimating length distributions"
 length_stats ${5}/${sample}.trimmed.derep.fasta ${5}/${6}
@@ -300,7 +300,8 @@ if [[ "$file_size" -gt 3 ]]; then
     # merge them
     # merge the individual otu tables
     files=`echo split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
-    usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt
+    usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt \
+      -threads ${cpus}
 
 else
     # execute full
@@ -308,5 +309,5 @@ else
     usearch -otutab ${outdir}/all.lengthfilter_relabel.fastq  -sample_delim _ \
       -zotus ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.udb -otutabout \
       ${outdir}/all_${primer_name}zotutab_${usearch_min_size}.txt -mapout \
-      ${outdir}/all_${primer_name}zmap_${usearch_min_size}.txt
+      ${outdir}/all_${primer_name}zmap_${usearch_min_size}.txt -threads ${cpus}
 fi
