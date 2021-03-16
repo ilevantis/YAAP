@@ -1,0 +1,13 @@
+name: yaap
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3
+  - cutadapt=1.18
+  - vsearch
+  - pear
+  - seqkit
+  - fastqc
+  - parallel
