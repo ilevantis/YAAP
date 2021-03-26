@@ -105,6 +105,7 @@ Forward primer = ACTAG
 Reverse primer = CTAAA
 
 **Example command:**
+
 The sample fastq files are listed in `file_list.txt`. The primers used were 
  `GGWACWGGWTGAACWGTWTAYCCYC` as forward, and `TAAACTTCAGGGTGACCAAAAAATCA` as 
  reverse. Running on a machine with 28 cpus. You can run the pipeline as:
