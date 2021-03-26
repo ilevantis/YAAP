@@ -1,18 +1,17 @@
 ﻿# YAAP
 Yet Another Amplicon denoising Pipeline (YAAP), is a pipeline to analyse 
 metabarcoding amplicon data. It performs QC, adapter removal, denoising and 
-ZOTU table construction
+ZOTU table construction.
+
+This is a fork to tidy up the documentation and bash formatting so I could understand it better.
+Original repo at https://github.com/CristescuLab/YAAP .
 
 Table of Contents
 =================
 
    * [YAAP](#yaap)
       * [Dependencies](#dependencies)
-         * [Installation of dependencies](#installation-of-dependencies)
-            * [The easier (no gurarantees) way](#the-easier-no-gurarantees-way)
-         * [The not so easy, but easy way](#the-not-so-easy-but-easy-way)
-            * [Linking files to your bin directory (REQUIRES ADMIN PRIVILEGES )](#linking-files-to-your-bin-directory-requires-admin-privileges-)
-            * [Exporting the path](#exporting-the-path)
+      * [Installation](#installation)
       * [Usage](#usage)
       * [ISSUES](#issues)
 
@@ -33,88 +32,29 @@ https://www.drive5.com/usearch/))
 This git contains the binaries (executables) of pear, seqkit, and usearch, 
 however, vsearch and cutadapt have to be installed locally.
 
-### Installation of dependencies
-All the instructions here are only tested in linux systems. You might have to 
-adjust part of it for other operating systems.
+## Installation
 
-#### **The easier (no gurarantees) way**
-I recently added a bash script to install all dependencies for you. It might 
-not work in all systems, but it might be worth given a try. This script assumes
-that you have python3 in your environment ans can be executed as python. If you
-are in a Compute canada cluster, you need to load the `scipy-stack/2018b` 
-module. So let's assume that you want me to walk you though all the 
-installation. Then you need to:
-1. Clone this repository (you need to have git installed):
-```bash
-git clone https://github.com/CristescuLab/YAAP.git
-```
-2. Get into the folder:
-```bash
-cd YAAP
-```
-2.  Because of the licence in usearch I am not allowed to distribute the binary.
-So you will need to visit [https://drive5.com/usearch/download.html](
-https://www.drive5.com/usearch/) download 
-the latest LINUX version from your email, and place it in this folder (the YAAP 
-folder)
+1. All the dependencies for this pipeline (except usearch) can be easily installed using conda.
 
-4. Execute the `install_dependencies.sh` code:
-```bash
-bash install_dependencies.sh <name of usearch binary>
 ```
-You will need to change `<name of usearch binary>` for the actual name of the 
-binary you downloaded from usearch 
-5. Test that all dependencies work:
-```bash
+# grab the conda environment specification file
+wget 'https://raw.githubusercontent.com/ilevantis/YAAP/master/yaap_env.yml'
+# install the specified dependencies with conda
+conda env create -f yaap_env
+```
+
+2. Now install the appropriate version of usearch from https://www.drive5.com/usearch/ . 
+
+3. Test that all dependencies work:
+```
 cutadapt -h
 vsearch -h
 pear -h
 seqkit -h
 usearch 
 ```
-If all of the above commands do not give you errors, you are good to go!! If you still have errors, try:
-```bash
-source ~/.bashrc
-```
-And then, try again.
-
-### **The not so easy, but easy way**
-1. cutadapt: Follow the instructions at [
-https://cutadapt.readthedocs.io/en/stable/installation.html](
-https://cutadapt.readthedocs.io/en/stable/installation.html). If you are using 
-a computer cluster I advice you AGAINST installing cutadapt with conda.
-2. vsearch: Follow the instruction at [https://github.com/torognes/vsearch](
-https://github.com/torognes/vsearch)
-
-For the rest of the dependencies, you need to point your path to the executable
-directory or copy/link the executables to your bin directory.  Alternatively, 
-you can install them from scratch in your system.
-
-#### Linking files to your bin directory (REQUIRES ADMIN PRIVILEGES )
-If you don't have administrator privileges, go to [the next section](#exporting-the-path). 
-If you do, you can just copy (`cp`) or symbolically link (`ln -s`). 
-For example, let's say that you cloned YAAP to your home directory and let's 
-assume that your username is `user1`. If you are in a linux system you can just
- type:
-
-```
-cd /home/user1/YAAP/executables_linux_64/
-sudo ln -s * /usr/local/bin
-```
-
-Then pear, seqkit, and usearch are available to the pipeline.
 
 
-#### Exporting the path
-If you don't have administrator privileges, you can let the system know to look
- for the executables in the appropriate folder. As before, let's assume that 
- your username is `user1` and that you clone the repository in home. You can 
- export the path by typing:
-```
-cd /home/user1/YAAP/executables_linux_64/
-echo "export PATH=$PATH:$PWD" >> ~/.bashrc
-source ~/.bashrc
-```
 
 ## Usage
 YAAP has a single bash script called ASV_pipeline.sh. It requires 8 arguments:
@@ -142,11 +82,32 @@ demultiplexed fastq files are `MI.M03555_0320.001.N701N517.MC1_R1.fastq.gz`,
 MI.M03555_0320.001.N701N517.MC1
 MI.M03555_0320.001.N702N517.MC2 
  ```
-Alternatively, you can also create the with the path where the file sets are. 
-Let's assume that you called this file `file_list.txt`. Let's also assumed that
- you are working with the Leray fragments flanked by 
+
+The args 2 and 3 are the forward and reverse primer sequences. Forward primer 
+is written as expected (5'-3'). Reverse primer is also written in the 5'-3'
+orientation - i.e. what you would see at the beginning of a read derived 
+from the reverse strand of the amplicon.
+
+For the following dsDNA amplicon:
+```
+dsDNA:
+5'-ACTAGgctgactgTTTAG-3'
+3'-TGATCcgactgacAAATC-5'
+
+read from forward strand:
+ACTAGgctgactgTTTAG
+
+read from reverse strand:
+CTAAAcagtcagcCTAGT
+```
+
+Forward primer = ACTAG
+Reverse primer = CTAAA
+
+**Example command:**
+The sample fastq files are listed in `file_list.txt`. The primers used were 
  `GGWACWGGWTGAACWGTWTAYCCYC` as forward, and `TAAACTTCAGGGTGACCAAAAAATCA` as 
- reverse, and in a machine that have 28 cpus. You can run the pipeline as:
+ reverse. Running on a machine with 28 cpus. You can run the pipeline as:
 ```
 bash ~/YAAP/ASV_pipeline.sh file_list.txt \
 GGWACWGGWTGAACWGTWTAYCCYC TAAACTTCAGGGTGACCAAAAAATCA \
