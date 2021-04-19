@@ -54,7 +54,12 @@ seqkit -h
 usearch 
 ```
 
-
+4. Put a copy of ASV_pipeline.sh into your bin folder and make it executable:
+```
+cd ~/bin
+wget 'https://raw.githubusercontent.com/ilevantis/YAAP/master/ASV_pipeline.sh'
+chmod +x ASV_pipeline.sh
+```
 
 ## Usage
 YAAP has a single bash script called ASV_pipeline.sh. It requires 8 arguments:
