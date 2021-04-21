@@ -230,7 +230,7 @@ prefix=$5
 cpus=$6
 min_len=$7
 max_len=$8
-outdir=${prefix}_output${primer_name}
+outdir=${prefix}_output_${primer_name}
 min_read_len=$(( (min_len / 2) - 20 ))
 usearch_min_size=${9}
 
