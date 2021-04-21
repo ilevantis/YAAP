@@ -314,6 +314,7 @@ file_size=$(( file_size / 1000000000 ))
 if [[ "$file_size" -gt 3 ]]; then
     # split file into 3GB chunks
     p=`python -c "from math import ceil; print(int(ceil(${file_size}/3)))"`
+    echo -e "\nLarge fastq file: splitting into ${p} parts for ZOTU mapping"
     seqkit split2 ${outdir}/all.lengthfilter_relabel.fastq -p ${p} -f -O ${outdir}/split
 
     # execute in smaller files
@@ -328,6 +329,8 @@ if [[ "$file_size" -gt 3 ]]; then
     done
 
     # merge them
+    echo -e "\nMerging split OTU tables and mapping files"
+    
     # merge the individual otu tables
     files=`echo ${outdir}/split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
     # usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt -threads ${cpus}
@@ -335,6 +338,7 @@ if [[ "$file_size" -gt 3 ]]; then
     
     # merge zmap files
     cat ${outdir}/split/*zmap_${usearch_min_size}.txt > ${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt
+    
     
 else
     # execute full
@@ -345,3 +349,9 @@ else
       -mapout ${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt \
       -threads ${cpus}
 fi
+
+echo -e "\n\n"
+echo -e "Final ZOTU table, ZOTU mapping file, ZOTU fasta file:"
+echo -e "${outdir}/all_${primer_name}_zotutab_${usearch_min_size}.txt"
+echo -e "${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt"
+echo -e "${outdir}/all_lengthfilter_zotus_${usearch_min_size}.fasta"
