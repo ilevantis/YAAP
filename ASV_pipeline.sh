@@ -355,3 +355,8 @@ echo -e "Final ZOTU table, ZOTU mapping file, ZOTU fasta file:"
 echo -e "${outdir}/all_${primer_name}_zotutab_${usearch_min_size}.txt"
 echo -e "${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt"
 echo -e "${outdir}/all_lengthfilter_zotus_${usearch_min_size}.fasta"
+
+echo -e "\n"
+echo -e "Stats for each step and seq length distributions:"
+echo -e "${outdir}/${prefix}.stats"
+echo -e "${outdir}/${prefix}_distribution.txt"
