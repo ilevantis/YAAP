@@ -330,7 +330,7 @@ if [[ "$file_size" -gt 3 ]]; then
     # merge the individual otu tables
     files=`echo ${outdir}/split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
     # usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt -threads ${cpus}
-    otutab_merge ${files} ${outdir}/all_${primer_name}zotutab_${usearch_min_size}.txt
+    otutab_merge ${files} ${outdir}/all_${primer_name}_zotutab_${usearch_min_size}.txt
     
     # merge zmap files
     cat ${outdir}/split/*zmap_${usearch_min_size}.txt > ${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt
