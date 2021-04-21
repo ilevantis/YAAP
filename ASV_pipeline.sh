@@ -276,10 +276,10 @@ vsearch --derep_fulllength  ${outdir}/all.lengthfilter.fastq -sizein -sizeout \
 
 # execute denoising in full file
 echo -e "\nDenoising"
-usearch -unoise3 ${outdir}/vs_all_lengthfilter.fasta -zotus \
-  ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.fasta \
-  -minsize ${usearch_min_size} -tabbedout \
-  ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt
+usearch -unoise3 ${outdir}/vs_all_lengthfilter.fasta \
+  -zotus ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.fasta \
+  -minsize ${usearch_min_size} \
+  -tabbedout ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt
 
 # Rename to Zotu
 echo -e "\n Renaming sequences"
@@ -323,7 +323,8 @@ if [[ "$file_size" -gt 3 ]]; then
         usearch -otutab ${i}  -sample_delim _ \
           -zotus ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.udb \
           -otutabout ${dir}/${part}_zotutab_${usearch_min_size}.txt \
-          -mapout ${dir}/${part}zmap_${usearch_min_size}.txt
+          -mapout ${dir}/${part}zmap_${usearch_min_size}.txt \
+          -threads ${cpus}
     done
 
     # merge them
