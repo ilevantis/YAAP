@@ -59,6 +59,35 @@ with open('${2}_distribution.txt', 'a+') as F:
 EOF
 }
 
+otutab_merge(){
+python - << EOF
+import csv
+from collections import defaultdict
+
+zotu_d = defaultdict(lambda:defaultdict(lambda:0))
+otutabs = '${1}'.split(',')
+for tab in otutabs:
+    with open(tab, newline='') as csvfile:
+        dr = csv.DictReader(csvfile, delimiter='\t')
+        for r in dr:
+            zotu_id = r.pop('#OTU ID')
+            for smpl,count in r.items():
+                zotu_d[zotu_id][smpl] += int(count)
+
+samples = set( k for d in zotu_d.values() for k in d.keys() )
+
+with open('${2}', 'w', newline='') as csvfile:
+    cols = ['#OTU ID'] + list(samples)
+    dw = csv.DictWriter(csvfile, fieldnames=cols, restval=0, delimiter='\t')
+    dw.writeheader()
+    for zid,zd in zotu_d.items():
+        d = dict(zd)
+        d['#OTU ID'] = zid
+        dw.writerow(d)
+EOF
+}
+
+
 
 run_QC_single_pair(){
 # Argumnets:
@@ -300,8 +329,8 @@ if [[ "$file_size" -gt 3 ]]; then
     # merge them
     # merge the individual otu tables
     files=`echo split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
-    usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt \
-      -threads ${cpus}
+    # usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt -threads ${cpus}
+    otutab_merge ${files} ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt
 
 else
     # execute full
