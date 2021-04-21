@@ -314,10 +314,10 @@ file_size=$(( file_size / 1000000000 ))
 if [[ "$file_size" -gt 3 ]]; then
     # split file into 3GB chunks
     p=`python -c "from math import ceil; print(int(ceil(${file_size}/3)))"`
-    seqkit split2 ${outdir}/all.lengthfilter_relabel.fastq -p ${p} -f -O split
+    seqkit split2 ${outdir}/all.lengthfilter_relabel.fastq -p ${p} -f -O ${outdir}/split
 
     # execute in smaller files
-    for i in split/*part_* ; do
+    for i in ${outdir}/split/*part_* ; do
         dir=`dirname ${i}`
         part=`basename ${i} | rev | cut -d'.' -f 2 | rev`
         usearch -otutab ${i}  -sample_delim _ \
@@ -328,15 +328,19 @@ if [[ "$file_size" -gt 3 ]]; then
 
     # merge them
     # merge the individual otu tables
-    files=`echo split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
+    files=`echo ${outdir}/split/*zotutab_${usearch_min_size}.txt | tr ' ' ','`
     # usearch -otutab_merge ${files} -output ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt -threads ${cpus}
-    otutab_merge ${files} ${outdir}/allzotus_lengthfilter_${usearch_min_size}.txt
-
+    otutab_merge ${files} ${outdir}/all_${primer_name}zotutab_${usearch_min_size}.txt
+    
+    # merge zmap files
+    cat ${outdir}/split/*zmap_${usearch_min_size}.txt > ${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt
+    
 else
     # execute full
     # Created the Zotu table with the renamed samples
     usearch -otutab ${outdir}/all.lengthfilter_relabel.fastq  -sample_delim _ \
-      -zotus ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.udb -otutabout \
-      ${outdir}/all_${primer_name}zotutab_${usearch_min_size}.txt -mapout \
-      ${outdir}/all_${primer_name}zmap_${usearch_min_size}.txt -threads ${cpus}
+      -zotus ${outdir}/all_lengthfilter_zotus_${usearch_min_size}.udb \
+      -otutabout ${outdir}/all_${primer_name}_zotutab_${usearch_min_size}.txt \
+      -mapout ${outdir}/all_${primer_name}_zmap_${usearch_min_size}.txt \
+      -threads ${cpus}
 fi
